@@ -515,16 +515,16 @@ func (s *KubeconfigCopyTestSuite) TestDelete_RemovesCopiedKubeconfig() {
 			s.Assert().True(apierrors.IsNotFound(env.getCopiedKubeconfig(ctx)), "copied kubeconfig left on the runtime cluster")
 		})
 
-		s.Run("gives up when the runtime kubeconfig is gone", func() {
+		s.Run("waits while the runtime kubeconfig is missing", func() {
 			ctx := s.newCtx()
 			env := s.reconcileUntilCopied(ctx, toRemoteCluster)
 			s.Require().NoError(env.local.Delete(ctx, s.runtimeKubeconfigSecret(env.managedProvider.Namespace)))
 
 			s.Require().NoError(env.local.Delete(ctx, env.managedProvider))
-			s.Require().NoError(env.reconcile())
+			s.Require().Error(env.reconcile(), "deletion must wait until the runtime kubeconfig is restored")
 
-			s.Assert().True(apierrors.IsNotFound(env.getManagedProvider(ctx)), "ManagedProvider stuck waiting for a runtime cluster it can no longer reach")
-			s.Assert().NoError(env.getCopiedKubeconfig(ctx), "copy expected to stay, nothing can reach it without the runtime kubeconfig")
+			s.Assert().NoError(env.getManagedProvider(ctx), "ManagedProvider deleted without kubeconfig cleanup")
+			s.Assert().NoError(env.getCopiedKubeconfig(ctx), "copied kubeconfig gone from the runtime cluster")
 		})
 
 		s.Run("waits while the runtime kubeconfig is unusable", func() {

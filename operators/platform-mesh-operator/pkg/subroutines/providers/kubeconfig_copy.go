@@ -209,12 +209,6 @@ func (r *KubeconfigCopySubroutine) Finalize(ctx context.Context, obj ctrlruntime
 	inst.Status.Phase = pmprovidersv1alpha1.ManagedProviderPhaseDeleting
 
 	runtimeClusterClient, err := r.newRuntimeClusterClient(ctx, inst)
-	if apierrors.IsNotFound(err) {
-		// Without the runtime kubeconfig there is no way to reach the copy; blocking deletion would not bring it back.
-		logger.LoadLoggerFromContext(ctx).ChildLogger("subroutine", r.GetName()).Warn().
-			Str("secret", inst.Spec.RuntimeKubeconfigSecretName).Msg("Runtime kubeconfig Secret not found, leaving copied kubeconfig in place")
-		return subroutines.OK(), nil
-	}
 	if err != nil {
 		return subroutines.OK(), err
 	}
