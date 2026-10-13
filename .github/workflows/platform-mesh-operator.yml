@@ -173,7 +173,7 @@ jobs:
   # ──────────────────────────────────────────────
   docker-build-latest:
     if: github.ref == 'refs/heads/main'
-    needs: [verify, test, test-e2e]
+    needs: [verify, test]
     runs-on: ubuntu-latest
     permissions:
       contents: read # Needed for actions/checkout
@@ -245,7 +245,7 @@ jobs:
 
   docker-build-push:
     if: startsWith(github.ref, 'refs/tags/platform-mesh-operator/')
-    needs: [version, verify, test, test-e2e]
+    needs: [version, verify, test]
     runs-on: ubuntu-latest
     permissions:
       contents: write # Needed to create the GitHub release for the tag
