@@ -53,6 +53,7 @@ vars:
     - kro-composition-operator
     - platform-mesh-deployer
     - platform-mesh-operator
+    - provider-operator
     - resource-broker
     - search-operator
     - security-operator
